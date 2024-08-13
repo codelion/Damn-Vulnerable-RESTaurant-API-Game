@@ -18,7 +18,7 @@ RUN poetry install --no-root --without dev && rm -rf $POETRY_CACHE_DIR
 FROM python:3.8-slim-buster as runtime
 
 RUN apt-get update
-RUN apt-get -y install libpq-dev gcc vim sudo
+RUN apt-get -y install libpq-dev gcc vim
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
@@ -28,10 +28,8 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY app ./app
 WORKDIR /app
 
-# our Chef sometimes needs to find some files on the filesystem
-# we're allowing to run find with root permissions via sudo
-# in this way, our Chef is able to search everywhere across the filesystem
-RUN echo 'ALL ALL=(ALL) NOPASSWD: /usr/bin/find' | sudo tee /etc/sudoers.d/find_nopasswd > /dev/null
+# we're allowing the app to access necessary directories
+RUN chown -R app:app /app
 
 # for security, we're creating a dedicated non-root user
 RUN useradd -m app
