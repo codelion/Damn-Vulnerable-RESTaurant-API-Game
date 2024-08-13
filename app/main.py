@@ -11,9 +11,12 @@ def start_application():
         version="1.0.0",
         servers=[{"url": "http://localhost:8080", "description": "Local API server"}],
     )
+
+    trusted_domains = ['http://localhost:8080', 'https://yourtrusteddomain.com']
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=trusted_domains,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
